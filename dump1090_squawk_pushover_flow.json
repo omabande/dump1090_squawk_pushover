@@ -1,0 +1,86 @@
+[
+    {
+        "id": "159e7237.fd9f36",
+        "type": "http request",
+        "z": "56be64e.0d6171c",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "url": "http://localhost/dump1090/data/aircraft.json",
+        "tls": "",
+        "x": 249,
+        "y": 64,
+        "wires": [
+            [
+                "3c7125d9.1fb0b2"
+            ]
+        ]
+    },
+    {
+        "id": "72aa7102.826f28",
+        "type": "inject",
+        "z": "56be64e.0d6171c",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "",
+        "x": 92,
+        "y": 63,
+        "wires": [
+            [
+                "159e7237.fd9f36"
+            ]
+        ]
+    },
+    {
+        "id": "3c7125d9.1fb0b2",
+        "type": "function",
+        "z": "56be64e.0d6171c",
+        "name": "Split array into individual planes",
+        "func": "var m = [];\nfor (var i in msg.payload.aircraft) \n\n    if (msg.payload.aircraft[i].squawk === \"7500\" || msg.payload.aircraft[i].squawk === \"7600\" || msg.payload.aircraft[i].squawk === \"7700\")\n    \n{\n    m.push({payload:msg.payload.aircraft[i]});\n    }\n   return [m]; \n\n   \n",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 483,
+        "y": 68,
+        "wires": [
+            [
+                "808205b6.1e2148"
+            ]
+        ]
+    },
+    {
+        "id": "14bece1d.0e5bfa",
+        "type": "pushover",
+        "z": "56be64e.0d6171c",
+        "name": "Pushover",
+        "device": "7plus",
+        "title": "msg.payload",
+        "priority": 0,
+        "sound": "pushover",
+        "url": "",
+        "url_title": "",
+        "x": 900,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "808205b6.1e2148",
+        "type": "function",
+        "z": "56be64e.0d6171c",
+        "name": "Text für Pushover",
+        "func": "var newMsg = { payload: \" Loftnotfall SQUAWK \" + msg.payload.squawk + \" von Flug \" + msg.payload.flight + \" gemeldet!\" + \" Open: https://www.flightradar24.com/\" + msg.payload.flight };\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 610,
+        "y": 140,
+        "wires": [
+            [
+                "14bece1d.0e5bfa"
+            ]
+        ]
+    }
+]
